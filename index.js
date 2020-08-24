@@ -6,7 +6,7 @@ require("dotenv").config();
 // set up express
 const app = express();
 app.use(express.json());
-app.use(cors);
+app.use(cors());
 
 const PORT = process.env.PORT || 5000;
 
@@ -19,6 +19,7 @@ mongoose.connect(
   {
     useNewUrlParser: true,
     useUnifiedTopology: true,
+    useCreateIndex: true,
   },
   (err) => {
     if (err) throw err;
