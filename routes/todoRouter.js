@@ -1,6 +1,7 @@
 const router = require("express").Router();
 const auth = require("../middleware/auth");
 const Todo = require("../models/todoModel");
+const moment = require("moment");
 
 router.post("/", auth, async (req, res) => {
   try {
@@ -24,7 +25,7 @@ router.post("/", auth, async (req, res) => {
 
     const newTodo = new Todo({
       title,
-      date,
+      date: moment(date).format("MMMM Do YYYY"),
       startTime,
       endTime,
       description,
@@ -54,6 +55,20 @@ router.delete("/:id", auth, async (req, res) => {
 
   const deletedTodo = await Todo.findByIdAndDelete(req.params.id);
   res.json(deletedTodo);
+});
+
+router.put("/date", auth, async (req, res) => {
+  const todos = await Todo.find({
+    userId: req.user,
+    date: req.body.date,
+  });
+
+  if (!todos)
+    return res.status(400).json({
+      msg: "No todo found with at this date",
+    });
+
+  res.json(todos);
 });
 
 module.exports = router;
