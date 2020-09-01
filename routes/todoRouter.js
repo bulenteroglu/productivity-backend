@@ -28,6 +28,7 @@ router.post("/", auth, async (req, res) => {
       date: moment(date).format("MMMM Do YYYY"),
       startTime,
       endTime,
+      done: false,
       description,
       catagory,
       userId: req.user,
@@ -68,6 +69,34 @@ router.put("/date", auth, async (req, res) => {
       msg: "No todo found with at this date",
     });
 
+  res.json(todos);
+});
+
+router.put("/done/:id", auth, async (req, res) => {
+  const { done } = req.body;
+
+  const todo = await Todo.findOne({ userId: req.user, _id: req.params.id });
+  if (!todo)
+    return res.status(400).json({
+      msg: "No todo found with this ID that belongs to the current user",
+    });
+
+  const editedTodo = await Todo.findByIdAndUpdate(
+    req.params.id,
+    {
+      done,
+    },
+    { new: true }
+  );
+  res.json(editedTodo);
+});
+
+router.put("/all/done", auth, async (req, res) => {
+  const todos = await Todo.find({
+    userId: req.user,
+    done: true,
+    date: req.body.date,
+  });
   res.json(todos);
 });
 
